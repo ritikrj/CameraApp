@@ -1,16 +1,20 @@
 package com.rk.cameraapp
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import com.rk.cameraapp.databinding.ActivityMainBinding
 import android.Manifest
+import android.content.Intent
+import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
+import com.bumptech.glide.Glide
+import com.rk.cameraapp.databinding.ActivityMainBinding
 import java.io.File
+
+
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -29,6 +33,33 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             takePhoto()
         }
+        binding.mediaApiButon.setOnClickListener {
+
+            val intent =  Intent();
+            intent.type = "image/*";
+            intent.action = Intent.ACTION_GET_CONTENT;
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 0);
+
+        }
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0  && resultCode == RESULT_OK) {
+            if (data == null) {
+                //Display an error
+                return
+            }
+            val Uri = data.data
+            val intent = Intent(this, EditorActivity::class.java)
+            intent.putExtra("URI", Uri)
+            startActivity(intent)
+            Glide.with(applicationContext).load(Uri).into(binding.viewer)
+
+        }
+
 
     }
 
